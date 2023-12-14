@@ -1,0 +1,40 @@
+const path = require('path');
+const { app, BrowserWindow } = require('electron');
+
+const isDev = process.env.NODE_ENV !== 'production';
+const isMac = process.platform === 'darwin';
+
+// Usar npx electronmon . para deixar a tela aberta e sempre atualizar.
+function createMainWindow() {
+    const mainWindow = new BrowserWindow({
+        title: 'Todo List',
+        width: isDev ? 1000 : 800,
+        height: 600,
+        webPreferences: {
+            nodeIntegration: true,
+        },
+    });
+
+    // Open devtools if in dev env
+    if (isDev) {
+        mainWindow.webContents.openDevTools();
+    }
+
+    mainWindow.loadFile(path.join(__dirname, './todo/index.html'));
+}
+
+app.whenReady().then(() => {
+    createMainWindow();
+
+    app.on('activate', () => {
+        if (BrowserWindow.getAllWindows().length === 0) {
+            createMainWindow();
+        }
+    });
+});
+
+app.on('window-all-closed', () => {
+    if (!isMac) {
+        app.quit();
+    }
+})
